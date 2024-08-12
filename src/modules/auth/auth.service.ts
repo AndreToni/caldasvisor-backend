@@ -54,7 +54,7 @@ export class AuthService {
                 email: email,
                 token: refresh_token,
                 title: 'Recuperação de senha',
-                body: `http://localhost:3000/recover-password?token=${refresh_token}&user=${user.id}`
+                body: `https://caldasvisor-frontend.vercel.app/recover-password?token=${refresh_token}&user=${user.id}`
             }
 
             const response = await this.nodemailerService.sendEmail(messageOptions);

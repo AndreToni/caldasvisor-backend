@@ -88,7 +88,7 @@ export class NodemailerService {
               <body>
                 <div class="container">
                     <div class="header">
-                        <img src="http://localhost:3000/LogoVerticalFullColor.svg" alt="CaldasVisor Logo">
+                        <img src="https://caldasvisor-frontend.vercel.app/LogoVerticalFullColor.svg" alt="CaldasVisor Logo">
                     </div>
                     <div class="content">
                         <h1>Recuperação de Senha</h1>
