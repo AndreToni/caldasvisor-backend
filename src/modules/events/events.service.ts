@@ -168,7 +168,7 @@ export class EventsService {
           } else {
             await this.ticketsService.create({
               ...tickets[i],
-              touristAttractionId: exists.id
+              eventId: exists.id
             })
           }
         }
