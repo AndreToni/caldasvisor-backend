@@ -25,7 +25,7 @@ export class Location {
     @Column({type: 'decimal', precision: 10, scale: 8, nullable: true})
     lng: number;
 
-    @Column('varchar', { length: 400 })
+    @Column('longtext')
     description: string;
 
     @Column({nullable: true})
