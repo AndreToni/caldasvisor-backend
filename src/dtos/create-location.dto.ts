@@ -6,12 +6,12 @@ import { CreateTicketDto } from "src/modules/tickets/dto/create-ticket.dto";
 
 const tickets: Array<CreateTicketDto> = [
     {
-        link: '',
+        link: 'https://exemplo.com/compra-inteira',
         type: TypeTicket.inteira,
         value: '50,00'
     },
     {
-        link: '',
+        link: 'https://exemplo.com/compra-inteira',
         type: TypeTicket.meia,
         value: '25,00'
     }
