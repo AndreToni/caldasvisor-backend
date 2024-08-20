@@ -21,16 +21,22 @@ export class TouristAttractionsService {
   
   async create(createTouristAttractionDto: CreateTouristAttractionDto, user: User) {
     try {
-      const {openingHours, tickets, zipCode, ...data} = createTouristAttractionDto;
-      const address = await this.googleMapsService.findPlace(decodeURIComponent(zipCode.toString())).then(res => res?.results[0] ?? null);
+      const {openingHours, tickets, address, zipCode, ...data} = createTouristAttractionDto;
+      const { city, location, district, state, route, number } = await this.googleMapsService.findPlace(`${address}, ${zipCode}`).then(res => res?.results[0] ?? null);
+      const formattedAddress = [
+        route,
+        number && `, ${number}`,
+        district && ` - ${district}`
+      ].filter(Boolean).join('');
+
       const touristAttraction = await this.repository.save({
         ...data, 
-        lat: address?.location.lat, 
-        lng: address?.location.lng,
+        lat: location.lat,
+        lng: location.lng,
         zipCode,
-        address: address.formatted_address,
-        city: address.city,
-        state: address.state,
+        address: formattedAddress,
+        city: city,
+        state: state,
         organizer: user
       });
 
@@ -127,19 +133,25 @@ export class TouristAttractionsService {
       });
       if(!exists) throw new Error('Ponto turístico não foi encontrado.');
 
-      const {openingHours, tickets, zipCode, ...data} = updateTouristAttractionDto;
-      const address = await this.googleMapsService.findPlace(decodeURIComponent(zipCode.toString())).then(res => res?.results[0] ?? null);
+      const {openingHours, tickets, address, zipCode, ...data} = updateTouristAttractionDto;
+      const { city, location, district, state, route, number } = await this.googleMapsService.findPlace(`${address}, ${zipCode}`).then(res => res?.results[0] ?? null);
+      const formattedAddress = [
+        route,
+        number && `, ${number}`,
+        district && ` - ${district}`
+      ].filter(Boolean).join('');
 
-      await this.repository.update(id, {
+       await this.repository.update(id, {
         ...data,
-        lat: address?.location.lat, 
-        lng: address?.location.lng,
+        lat: location.lat,
+        lng: location.lng,
         zipCode,
-        address: address.formatted_address,
-        city: address.city,
-        state: address.state,
+        address: formattedAddress,
+        city: city,
+        state: state,
         organizer: exists.organizer
-      })
+      });
+
       
       if(openingHours) {
         for(let i = 0; i < openingHours.length; i++) {
