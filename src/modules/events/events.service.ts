@@ -21,18 +21,23 @@ export class EventsService {
 
   async create(createEventDto: CreateEventDto, user: User) {
     try {
-      const { openingHours, tickets, zipCode, ...data } = createEventDto;
-      const address = await this.googleMapsService.findPlace(decodeURIComponent(zipCode.toString())).then(res => res?.results[0] ?? null);
+      const { openingHours, tickets, zipCode, address, ...data } = createEventDto;
+      const { city, location, district, state, route, number } = await this.googleMapsService.findPlace(`${address}, ${zipCode}`).then(res => res?.results[0] ?? null);
+      const formattedAddress = [
+        route,
+        number && `, ${number}`,
+        district && ` - ${district}`
+      ].filter(Boolean).join('');
 
-      const event = await this.repository.save({ 
-        ...data, 
-        lat: address?.location.lat, 
-        lng: address?.location.lng,
+      const event = await this.repository.save({
+        ...data,
+        lat: location.lat,
+        lng: location.lng,
         zipCode,
-        address: address.formatted_address,
-        city: address.city,
-        state: address.state,
-        organizer: user 
+        address: formattedAddress,
+        city: city,
+        state: state,
+        organizer: user
       });
 
       if (event && openingHours) {
@@ -103,10 +108,10 @@ export class EventsService {
   async findOne(id: string) {
     try {
       const exists = await this.repository.findOne({
-        where: {id},
-        relations: ['openingHours', 'tickets', 'organizer'] 
+        where: { id },
+        relations: ['openingHours', 'tickets', 'organizer']
       });
-      if(!exists) throw new Error('Evento não foi encontrado.');
+      if (!exists) throw new Error('Evento não foi encontrado.');
 
       return {
         success: true,
@@ -123,28 +128,33 @@ export class EventsService {
   async update(id: string, updateTouristAttractionDto: UpdateEventDto) {
     try {
       const exists = await this.repository.findOne({
-        where: {id},
-        relations: ['openingHours', 'tickets', 'organizer'] 
+        where: { id },
+        relations: ['openingHours', 'tickets', 'organizer']
       });
-      if(!exists) throw new Error('Evento não foi encontrado.');
+      if (!exists) throw new Error('Evento não foi encontrado.');
 
-      const {openingHours, tickets, zipCode, ...data} = updateTouristAttractionDto;
-      const address = await this.googleMapsService.findPlace(decodeURIComponent(zipCode.toString())).then(res => res?.results[0] ?? null);
+      const { openingHours, tickets, address, zipCode, ...data } = updateTouristAttractionDto;
+      const { city, location, district, state, route, number } = await this.googleMapsService.findPlace(`${address}, ${zipCode}`).then(res => res?.results[0] ?? null);
+      const formattedAddress = [
+        route,
+        number && `, ${number}`,
+        district && ` - ${district}`
+      ].filter(Boolean).join('');
 
       await this.repository.update(id, {
         ...data,
-        lat: address?.location.lat, 
-        lng: address?.location.lng,
+        lat: location.lat,
+        lng: location.lng,
         zipCode,
-        address: address.formatted_address,
-        city: address.city,
-        state: address.state,
+        address: formattedAddress,
+        city: city,
+        state: state,
         organizer: exists.organizer
       });
-      
-      if(openingHours) {
-        for(let i = 0; i < openingHours.length; i++) {
-          if(openingHours[i].id) {
+
+      if (openingHours) {
+        for (let i = 0; i < openingHours.length; i++) {
+          if (openingHours[i].id) {
             await this.openingHoursService.update(openingHours[i].id, {
               ...openingHours[i],
               eventId: exists.id
@@ -157,10 +167,10 @@ export class EventsService {
           }
         }
       }
-      
-      if(tickets) {
-        for(let i = 0; i < tickets.length; i++) {
-          if(tickets[i].id) {
+
+      if (tickets) {
+        for (let i = 0; i < tickets.length; i++) {
+          if (tickets[i].id) {
             await this.ticketsService.update(tickets[i].id, {
               ...tickets[i],
               touristAttractionId: exists.id
@@ -189,10 +199,10 @@ export class EventsService {
   async remove(id: string) {
     try {
       const exists = await this.repository.findOne({
-        where: {id}, 
+        where: { id },
       });
 
-      if(!exists) throw new Error('Evento não foi encontrado.');
+      if (!exists) throw new Error('Evento não foi encontrado.');
 
       await this.repository.delete(id);
 
@@ -211,9 +221,9 @@ export class EventsService {
   async uploadFile(id: string, file: Express.Multer.File) {
     try {
       const exists = await this.repository.findOne({
-        where: {id}, 
+        where: { id },
       });
-      if(!exists) throw new Error('Evento não foi encontrado.');
+      if (!exists) throw new Error('Evento não foi encontrado.');
 
       exists.images = [...exists.images, file.path];
 
