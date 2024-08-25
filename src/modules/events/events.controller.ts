@@ -54,4 +54,9 @@ export class EventsController {
   uploadImage(@Param('id', ParseUUIDPipe) id: string, @UploadedFile() file: Express.Multer.File) {
     return this.eventsService.uploadFile(id, file);
   }
+
+  @Delete(':id/remove-image')
+  removeFile(@Param('id', ParseUUIDPipe) id: string, @Body() {path}: {path: string}) {
+    return this.eventsService.removeFile(id, path);
+  }
 }

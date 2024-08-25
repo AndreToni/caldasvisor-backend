@@ -239,4 +239,26 @@ export class EventsService {
       }
     }
   }
+
+  async removeFile(id: string, path: string) {
+    try {
+      const exists = await this.repository.findOne({
+        where: {id}, 
+      });
+      if(!exists) throw new Error('Evento não foi encontrado.');
+
+      exists.images = exists.images?.filter(item => item != path);
+
+      return {
+        success: true,
+        message: 'Upload realizado com sucesso.',
+        result: await this.repository.save(exists)
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
+      }
+    }
+  }
 }
