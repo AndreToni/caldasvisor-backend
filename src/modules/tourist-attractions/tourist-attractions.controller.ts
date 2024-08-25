@@ -56,7 +56,7 @@ export class TouristAttractionsController {
     return this.touristAttractionsService.uploadFile(id, file);
   }
  
-  @Delete(':id/remove-image')
+  @Post(':id/remove-image')
   removeFile(@Param('id', ParseUUIDPipe) id: string, @Body() {path}: {path: string}) {
     return this.touristAttractionsService.removeFile(id, path);
   }

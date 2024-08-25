@@ -55,7 +55,7 @@ export class EventsController {
     return this.eventsService.uploadFile(id, file);
   }
 
-  @Delete(':id/remove-image')
+  @Post(':id/remove-image')
   removeFile(@Param('id', ParseUUIDPipe) id: string, @Body() {path}: {path: string}) {
     return this.eventsService.removeFile(id, path);
   }
