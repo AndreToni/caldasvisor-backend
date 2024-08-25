@@ -225,7 +225,7 @@ export class EventsService {
       });
       if (!exists) throw new Error('Evento não foi encontrado.');
 
-      exists.images = [...exists.images, file.path];
+      exists.images = exists.images ? [...exists.images, file.path] : [file.path];
 
       return {
         success: true,
